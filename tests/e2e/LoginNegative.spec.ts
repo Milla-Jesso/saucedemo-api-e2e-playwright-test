@@ -3,14 +3,16 @@ import { expect, test } from "../fixtures/CommonFixtures";
 const STANDARD_USER = process.env["USERNAME"];
 const WRONG_PASSWORD = process.env["WRONG_PASSWORD"];
 
-if (!STANDARD_USER || !WRONG_PASSWORD ) {
+if (!STANDARD_USER || !WRONG_PASSWORD) {
     throw new Error(
         "STANDARD_USER, WRONG_PASSWORD, and E2E_SAUCEDEMO_BASE_URL must be set (see .env.example). " +
         "Failing fast here beats a confusing login-form failure deep in the test."
     );
 }
 
-test.describe('Login - negative cases', () => {
+test.describe('Login - negative cases', {
+    tag: ['@e2e']
+}, () => {
     /**
      * GIVEN the user provides an invalid username or password
      * WHEN the user attempts to log in

@@ -3,15 +3,16 @@ import { test } from "../fixtures/CommonFixtures";
 const STANDARD_USER = process.env["USERNAME"];
 const STANDARD_PASSWORD = process.env["PASSWORD"];
 
-if (!STANDARD_USER || !STANDARD_PASSWORD ) {
+if (!STANDARD_USER || !STANDARD_PASSWORD) {
     throw new Error(
         "STANDARD_USER and STANDARD_PASSWORD must be set (see .env.example). " +
         "Failing fast here beats a confusing login-form failure deep in the test."
     );
 }
 
-test.describe("Checkout flow", () => {
-
+test.describe("Checkout flow", {
+    tag: ['@e2e']
+}, () => {
     /**
      * GIVEN the user is logged in with valid credentials
      * WHEN the user adds two items to the cart
@@ -28,5 +29,5 @@ test.describe("Checkout flow", () => {
         await cartPage.userProceedToCart(addedItems);
         await checkoutPage.userCheckoutAndCompleteOrder(addedItems);
         await cartPage.assertCartIsEmpty();
-    }); 
+    });
 });
