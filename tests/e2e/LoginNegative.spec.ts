@@ -11,7 +11,7 @@ if (!STANDARD_USER || !WRONG_PASSWORD) {
 }
 
 test.describe('Login - negative cases', {
-    tag: ['@e2e']
+    tag: ['@e2e', '@smoke', '@regression']
 }, () => {
     /**
      * GIVEN the user provides an invalid username or password

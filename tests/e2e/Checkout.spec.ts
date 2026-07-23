@@ -11,7 +11,7 @@ if (!STANDARD_USER || !STANDARD_PASSWORD) {
 }
 
 test.describe("Checkout flow", {
-    tag: ['@e2e']
+    tag: ['@e2e', '@smoke', '@regression']
 }, () => {
     /**
      * GIVEN the user is logged in with valid credentials

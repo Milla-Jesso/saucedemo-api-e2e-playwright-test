@@ -2,7 +2,7 @@ import { test, expect } from '../fixtures/CommonFixtures';
 import type { CreatePostPayload, Post } from './clients/PostsApiClient';
 
 test.describe('Posts API - create and read workflow', {
-    tag: ['@api'] }, () => {
+    tag: ['@api', '@regression'] }, () => {
     /**
      * GIVEN a valid post payload
      * WHEN a create request is sent to POST /posts

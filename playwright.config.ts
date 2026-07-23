@@ -1,62 +1,79 @@
-import type { PlaywrightTestConfig } from "@playwright/test";
-import { devices } from "@playwright/test";
+import type { PlaywrightTestConfig } from '@playwright/test';
+import { devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
-const config: PlaywrightTestConfig = {
-  testDir: "./tests",
-  /* Maximum time one test can run for. saucedemo is a lightweight public
-   * demo with no heavy backend calls, so this stays tight rather than the
-   * 30-minute ceiling I'd use on a slow enterprise app. */
-  timeout: 30000,
-  expect: {
 
+const config: PlaywrightTestConfig = {
+  testDir: './tests',
+
+  timeout: 30000,
+
+  expect: {
     timeout: 10000,
   },
+
   fullyParallel: true,
-  forbidOnly: !!process.env["CI"],
+
+  forbidOnly: !!process.env.CI,
+
   maxFailures: 0,
-  retries: process.env["CI"] ? 1 : 0,
-  workers: process.env["CI"] ? 1 : undefined,
-  reporter: process.env["CI"] ? [["github"], ["html", { open: "never" }]] : "html",
+
+  retries: process.env.CI ? 1 : 0,
+
+  // Let Playwright determine optimal workers.
+  // Override from CLI if needed:
+  // npx playwright test --workers=10
+  workers: Number(process.env.PLAYWRIGHT_WORKERS || 5),
+  reporter: process.env.CI
+    ? [
+      ['github'],
+      ['blob'],
+    ]
+    : [
+      ['html', { open: 'on-failure' }],
+    ],
+
   use: {
-    baseURL: process.env["E2E_SAUCEDEMO_BASE_URL"],
+    baseURL: process.env.E2E_SAUCEDEMO_BASE_URL,
     testIdAttribute: 'data-test',
-
-    /* Maximum time each action such as `click()` can take. */
     actionTimeout: 10000,
-
-    screenshot: "only-on-failure",
-    trace: process.env["CI"] ? "on-first-retry" : "retain-on-failure",
-    video: "retain-on-failure",
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
 
   projects: [
     {
-      name: "chromium",
-      testMatch: "tests/e2e/**/*.spec.ts",
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "ipad-webkit",
-      testMatch: "tests/e2e/**/*.spec.ts",
+      name: 'chromium',
+      testMatch: 'tests/e2e/**/*.spec.ts',
       use: {
-        ...devices["iPad Pro 11"],
-        viewport: { width: 834, height: 1188 },
+        ...devices['Desktop Chrome'],
       },
     },
+
     {
-      name: "api",
-      testMatch: "tests/api/**/*.spec.ts",
+      name: 'ipad-webkit',
+      testMatch: 'tests/e2e/**/*.spec.ts',
       use: {
-        baseURL: process.env["E2E_JSONPLACEHOLDER_BASE_URL"]
+        ...devices['iPad Pro 11'],
+        viewport: {
+          width: 834,
+          height: 1188,
+        },
+      },
+    },
+
+    {
+      name: 'api',
+      testMatch: 'tests/api/**/*.spec.ts',
+      use: {
+        baseURL: process.env.E2E_JSONPLACEHOLDER_BASE_URL,
       },
     },
   ],
-  outputDir: 'playwright-report/',
+
+  outputDir: 'test-results',
 };
 
 export default config;

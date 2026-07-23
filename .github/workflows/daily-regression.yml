@@ -1,33 +1,15 @@
-name: Playwright Manual Run
+name: Daily Regression
 
 on:
-  workflow_dispatch:
-    inputs:
-      suite:
-        description: 'Test suite'
-        required: true
-        default: '@smoke'
-        type: choice
-        options:
-          - '@api'
-          - '@e2e'
-          - '@smoke'
-          - '@regression'
+  schedule:
+    - cron: '0 0 * * *'
 
-      workers:
-        description: 'Workers per shard'
-        required: true
-        default: '2'
-        type: choice
-        options:
-          - '1'
-          - '2'
-          - '5'
-          - '10'
+  workflow_dispatch:
 
 jobs:
   test:
     name: Shard ${{ matrix.shard }}/4
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -60,11 +42,11 @@ jobs:
           WRONG_PASSWORD=${{ secrets.WRONG_PASSWORD }}
           EOF
 
-      - name: Run Tests
+      - name: Run Regression Tests
         run: |
           npx playwright test \
-            --grep "${{ github.event.inputs.suite }}" \
-            --workers=${{ github.event.inputs.workers }} \
+            --grep @regression \
+            --workers=2 \
             --shard=${{ matrix.shard }}/4
 
       - name: Upload Blob Report
@@ -77,21 +59,21 @@ jobs:
 
   report:
     name: Merge Reports
+
     if: always()
+
     needs: [test]
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install Dependencies
-        run: npm ci
+      - run: npm ci
 
       - name: Download Blob Reports
         uses: actions/download-artifact@v4
@@ -115,8 +97,11 @@ jobs:
 
   cleanup:
     name: Cleanup Blob Reports
+
     if: always()
+
     needs: [report]
+
     runs-on: ubuntu-latest
 
     steps:
