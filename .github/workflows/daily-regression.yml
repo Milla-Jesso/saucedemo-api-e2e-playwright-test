@@ -9,9 +9,10 @@ on:
 jobs:
   test:
     name: Shard ${{ matrix.shard }}/4
-
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
+    container: 
+      image: mcr.microsoft.com/playwright:v1.59.1-jammy
     strategy:
       fail-fast: false
       matrix:
@@ -28,9 +29,6 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
 
       - name: Create .env
         run: |
@@ -59,22 +57,17 @@ jobs:
 
   report:
     name: Merge Reports
-
     if: always()
-
     needs: [test]
-
     runs-on: ubuntu-latest
-
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - run: npm ci
-
       - name: Download Blob Reports
         uses: actions/download-artifact@v4
         with:
@@ -93,17 +86,15 @@ jobs:
         with:
           name: playwright-html-report
           path: playwright-report
-          retention-days: 30
+          retention-days: 1
 
   cleanup:
     name: Cleanup Blob Reports
-
     if: always()
-
     needs: [report]
-
     runs-on: ubuntu-latest
-
+    permissions:
+      actions: write
     steps:
       - name: Delete Blob Artifacts
         uses: actions/github-script@v7
