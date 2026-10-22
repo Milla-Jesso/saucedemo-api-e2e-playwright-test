@@ -30,7 +30,7 @@ jobs:
     name: Shard ${{ matrix.shard }}/4
     runs-on: ubuntu-latest
     container: 
-      image: mcr.microsoft.com/playwright:v1.59.1-jammy
+      image: mcr.microsoft.com/playwright:v1.61.1-jammy
 
     strategy:
       fail-fast: false
