@@ -60,6 +60,11 @@ jobs:
     if: always()
     needs: [test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: gh-pages-publish
+      cancel-in-progress: false
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -87,6 +92,20 @@ jobs:
           name: playwright-html-report
           path: playwright-report
           retention-days: 1
+
+      - name: Publish HTML Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          destination_dir: reports/${{ github.run_id }}
+          keep_files: true
+
+      - name: Add Report Link to Summary
+        run: |
+          URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_id }}/"
+          echo "::notice title=Playwright Report::$URL"
+          echo "### 📊 [Open Playwright HTML Report]($URL)" >> "$GITHUB_STEP_SUMMARY"
 
   cleanup:
     name: Cleanup Blob Reports
