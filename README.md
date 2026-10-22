@@ -96,6 +96,16 @@ npx playwright show-report
 
 Tests run automatically via GitHub Actions on push and pull request, using the workflow defined in `.github/workflows/playwright.yml`.
 
+## Scaling CI Across Teams
+
+If six teams each ran their own pipeline, these are the three standards I would enforce department-wide first:
+
+1. **A shared, version-pinned reusable workflow.** Each team calls one central workflow that pins the runner image, Node version and Playwright version, instead of copying YAML, so pipelines don't drift apart and an upgrade happens once instead of six times.
+2. **A tagged, required PR gate.** Every repo tags tests (`@smoke`, `@regression`), and a fast `@smoke` run is a required check on pull requests, while full regression runs nightly. This keeps feedback fast and gives the department one shared definition of "safe to merge".
+3. **One reporting standard.** Every run merges its shards into a single HTML report, publishes it to a stable link, and records retries so flaky tests stay visible. When a release is blocked, anyone can open any team's results and read them the same way, without asking the team for access.
+
+I would start with these three because they cover consistency, quality gating and visibility, and the other improvements depend on having them in place.
+
 ## Design Notes
 
 - **Page Object Model (POM)**: UI interactions are encapsulated in page classes under `tests/models/`, keeping specs focused on test logic rather than selectors.
